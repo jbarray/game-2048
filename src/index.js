@@ -54,9 +54,9 @@ class Info extends React.Component {
   }
 }
 
-const DEFAULT_DATA = [[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]];
+const DEFAULT_DATA = [[0, 0, 0, 0, 0], [0, 0, 2, 4, 0], [0, 0, 2, 8, 0], [0, 0, 0, 0, 0]];
 function Content() {
-  const { data, setData} = useState(DEFAULT_DATA);
+  const [data, setData] = useState(DEFAULT_DATA);
   // 监听鼠标事件, 判断当前位置, 和起始点的位置, 得出上下左右方位.
   // 方位事件中, 判断当前的值是不是和目标值相等, if相等则加和, 更新两个数据, 并且判断1.等于2048, 则提示胜出 2.无2048, 并且没有空格, 则提示失败 3. 无2048, 并且有空格, 产生一个数据, else不等不动.
 
