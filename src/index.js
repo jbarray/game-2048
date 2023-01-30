@@ -37,7 +37,7 @@ class Card {
 }
 
 const DEFAULT_DATA = [[0, 0, 0, 0, 0], [0, 0, 2, 4, 0], [0, 0, 2, 8, 0], [0, 0, 0, 0, 0]].map((item, index) => {
-  const newData = item.map((card, cardIndex) => (new Card(index, cardIndex, card)));
+  const newData = item.map((card, cardIndex) => (new Card(cardIndex, 3 - index, card)));
   return newData;
 }
 );
@@ -57,41 +57,56 @@ function Content() {
   });
 
   const onMove = (direc) => {
-    const flatData = data.flat();
+    const flatData = JSON.parse(JSON.stringify(data)).flat();
+    console.log(flatData, 'flatData');
     flatData.forEach((card) => {
+      console.log({x: card.x, y: card.y}, {
+        x: direc === 'left' ? card.x - 1 : direc === 'right' ? card.x + 1 : card.x,
+        y: direc === 'top' ? card.y + 1 : direc === 'bottom' ? card.y - 1 : card.y
+      }, 'value, target');
       onCardMove({x: card.x, y: card.y}, {
         x: direc === 'left' ? card.x - 1 : direc === 'right' ? card.x + 1 : card.x,
-        y: direc === 'top' ? card.y - 1 : direc === 'bottom' ? card.y + 1 : card.y
+        y: direc === 'top' ? card.y + 1 : direc === 'bottom' ? card.y - 1 : card.y
       });
     });
   };
 
   /* 方位事件中, 判断当前的值是不是和目标值相等, 
    if相等则加和, 更新两个数据, 并且判断1.等于2048, 则提示胜出 2.无2048, 并且没有空格, 则提示失败 3. 无2048, 并且有空格, 产生一个数据, else不等不动. */
-  const onCardMove = (valueCell, targetCell) => {
-    const value = data[valueCell.x][valueCell.y];
-    const targetValue = data[targetCell.x][targetCell.y];
+   const onCardMove = (valueCell, targetCell) => {
+    if (targetCell.x < 0 || targetCell.y < 0 || targetCell.x > 4 || targetCell.y > 3) return;
 
-    if (!value || (value !== targetValue && !targetValue) || value.merged) {
+    const currentCard = data[3 - valueCell.y][valueCell.x];
+    const targetCard = data[3 - targetCell.y][targetCell.x];
+    const currentPoint = `${3 - valueCell.y}-${valueCell.x}`;
+    const targetPoint = `${3 - targetCell.y}-${targetCell.x}`;
+
+    const value = currentCard.num;
+    const targetValue = targetCard.num;
+
+    console.log(value, targetValue, 'value');
+
+    if (!value || value === 0 || value !== targetValue || currentCard.merged) {
       return;
     }
 
     const newData = data;
-    newData[valueCell.x][valueCell.y].num = 0;
-    newData[targetCell.x][targetCell.y].num = targetValue * 2;
+    newData[currentPoint.split('-')[0]][currentPoint.split('-')[1]].num = 0;
+    newData[targetPoint.split('-')[0]][targetPoint.split('-')[1]].num = value + targetValue;
+    console.log(newData, "data");
     setData([...newData]);
 
-    if (newData.find(item => item.find(cell => cell === 2048))) {
-      alert('胜出!');
+    if (newData.find((item) => item.find((cell) => cell === 2048))) {
+      alert("胜出!");
       return;
     }
-    if (newData.find(item => item.find(cell => !cell))) {
-      alert('失败了!');
+    if (newData.find((item) => item.find((cell) => !cell))) {
+      alert("失败了!");
       setData(DEFAULT_DATA);
       return;
     }
     const randomData = [2, 4][Math.floor(Math.randomData * 2)];
-    newData[valueCell.x][valueCell.y].num = randomData;
+    // newData[currentPoint.split('-')[0]][currentPoint.split('-')[1]].num = randomData;
     setData([...newData]);
   };
 
@@ -118,11 +133,11 @@ class Game extends React.Component {
   render() {
     return (
       <div className="game">
-        <div className="game-info">
+        {/* <div className="game-info">
           <Info></Info>
-        </div>
+        </div> */}
         <Content />
-        <Score />
+        {/* <Score /> */}
       </div>
     );
   }
