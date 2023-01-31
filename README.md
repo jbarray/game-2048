@@ -1,1 +1,11 @@
-# game-2048
+# game-2048 react 版
+
+### 网页版, 支持上下左右键进行合并和移动.
+
+### 预览如下:
+
+<img src="./public/8.png">
+<img src="./public/32.png">
+<img src="./public/256.png">
+<img src="./public/1024.png">
+<img src="./public/2048.png">
