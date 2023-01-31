@@ -1,17 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
-
-class Info extends React.Component {
-  render() {
-    return (
-      <div>
-        <p>2048</p>
-        <p>试试游戏吧~</p>
-      </div>
-    );
-  }
-}
+import classNames from 'classnames';
 
 class Card {
   row = 0;
@@ -43,17 +33,29 @@ const KEYCODE_TYPES = {
   40: 'bottom'
 };
 
-function Content() {
+function Content({onDataChange}) {
   const [data, setData] = useState(DEFAULT_DATA);
-  // 监听键盘事件, 判断当前位置, 和起始点的位置, 得出上下左右方位.
-  window.addEventListener('keydown', (event) => {
-    const e = event || window.event;
-    onMove(KEYCODE_TYPES[e.keyCode]);
-  });
+
+  useEffect(() => {
+    // 监听键盘事件, 判断当前位置, 和起始点的位置, 得出上下左右方位.移动和新增
+    window.addEventListener('keydown', (event) => {
+      const e = event || window.event;
+      if (Object.keys(KEYCODE_TYPES).includes(e.keyCode.toString())) {
+        onMove(KEYCODE_TYPES[e.keyCode]);
+        onCreate();
+      }
+    });
+    return () => {
+      window.removeEventListener('keydown', {});
+    }
+  }, []);
+
+  useEffect(() => {
+    onDataChange(data);
+  }, [data]);
 
   const onMove = (direc) => {
     const flatData = JSON.parse(JSON.stringify(data)).flat();
-    console.log(flatData, 'flatData');
     flatData.forEach((card) => {
       onCardMove({row: card.row, col: card.col}, {
         row: direc === 'top' ? card.row - 1 : direc === 'bottom' ? card.row + 1 : card.row,
@@ -64,7 +66,7 @@ function Content() {
 
   /* 方位事件中, 判断当前的值是不是和目标值相等, 
    if相等则加和, 更新两个数据, 并且判断1.等于2048, 则提示胜出 2.无2048, 并且没有空格, 则提示失败 3. 无2048, 并且有空格, 产生一个数据, else不等不动. */
-   const onCardMove = (valueCell, targetCell, direc) => {
+   const onCardMove = (valueCell, targetCell, direc, isCreate) => {
     if (targetCell.col < 0 || targetCell.row < 0 || targetCell.col > 3 || targetCell.row > 3) return;
 
     const currentCard = data[valueCell.row][valueCell.col];
@@ -72,8 +74,7 @@ function Content() {
 
     const value = currentCard.num;
     const targetValue = targetCard.num;
-
-    console.log(value, targetValue, 'value');
+    const newData = data;
 
     if (!value || value === 0 
       || (targetValue !== 0 && value !== targetValue)) {
@@ -82,7 +83,6 @@ function Content() {
 
     // 替换
     if (targetValue === 0)  {
-      const newData = data;
       newData[valueCell.row][valueCell.col].num = 0;
       newData[targetCell.row][targetCell.col].num = value + targetValue;
       setData([...newData]);
@@ -93,12 +93,6 @@ function Content() {
       return;
     }
 
-    // 合并
-    const newData = data;
-    newData[valueCell.row][valueCell.col].num = 0;
-    newData[targetCell.row][targetCell.col].num = value + targetValue;
-    setData([...newData]);
-
     if (newData.find((item) => item.find((cell) => cell === 2048))) {
       alert("胜出!");
       return;
@@ -108,6 +102,15 @@ function Content() {
       setData(DEFAULT_DATA);
       return;
     }
+
+    // 合并
+    newData[valueCell.row][valueCell.col].num = 0;
+    newData[targetCell.row][targetCell.col].num = value + targetValue;
+    setData([...newData]);
+  };
+
+  const onCreate = () => {
+    const newData = data;
     const randomData = [2, 4][Math.floor(Math.random() * 2)];
     const emptyPointList = newData.map(line => (line.filter(point => point.num === 0))).flat();
     const randomEmptyCell = emptyPointList[Math.floor(Math.random() * emptyPointList.length)];
@@ -115,14 +118,14 @@ function Content() {
     setData([...newData]);
   };
 
-  return <table>
+  return <table className="board-table">
     <tbody>
       {
         data.map((item, index) => {
           return <tr key={index}>
             {
               item.map((cell, cellIndex) => {
-                return <th key={cellIndex}>{cell.num}</th>
+                return <th key={cellIndex} className={classNames('cell', `cell-${cell.num}`)}>{cell.num !== 0 ? cell.num : undefined}</th>
               })
             }
           </tr>
@@ -132,25 +135,26 @@ function Content() {
     </table>
 }
 
-function Score() {
-  return <div>得分: </div>
-}
-
 class Game extends React.Component {
+  constructor() {
+    super();
+    this.state = { maxData: 0 };
+  }
+  getMaxNum (data){
+    const sortData = data.flat().sort((a, b) => b.num - a.num);
+    this.setState({ maxData: sortData?.length > 0 ? sortData[0].num : 0});
+  }
+
   render() {
     return (
       <div className="game">
-        {/* <div className="game-info">
-          <Info></Info>
-        </div> */}
-        <Content />
-        {/* <Score /> */}
+        <div className="score">SCORE <span>{this.state.maxData}</span></div>
+        <Content onDataChange={(data) => this.getMaxNum(data)} />
       </div>
     );
   }
 }
 
 // ========================================
-
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(<Game />);

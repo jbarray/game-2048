@@ -3,49 +3,95 @@ body {
   margin: 20px;
 }
 
-ol,
-ul {
-  padding-left: 30px;
+.board-table {
+  background-color: rgb(110, 103, 96, 0.7);
+  border-radius: 4px;
+  padding: 5px;
+  border-spacing: 0;
 }
 
-.board-row:after {
-  clear: both;
-  content: '';
-  display: table;
-}
-
-.status {
-  margin-bottom: 10px;
-}
-
-.square {
-  background: #fff;
-  border: 1px solid #999;
-  float: left;
-  font-size: 24px;
-  font-weight: bold;
-  line-height: 34px;
-  height: 34px;
-  margin-right: -1px;
-  margin-top: -1px;
-  padding: 0;
+.cell {
   text-align: center;
-  width: 34px;
+  width: 100px;
+  height: 100px;
+  line-height: 100px;
+  background-color: #bbada0;
+  float: left;
+  font-weight: 700;
+  transition: all ease 0.3s;
+  margin: 5px;
 }
 
-.square:focus {
-  outline: none;
+.cell-2 {
+  color: #776e65;
+  background-color: #eee4da;
+  font-size: 24px;
+}
+.cell-4 {
+  color: #776e65;
+  background-color: #dcd0b9;
+  font-size: 24px;
+}
+.cell-8 {
+  color: #e6dfdb;
+  background-color: #f3b276;
+  font-size: 24px;
+}
+.cell-16 {
+  color: #f9f6f2;
+  background-color: #f59563;
+  font-size: 24px;
+}
+.cell-32 {
+  color: #e6dfdb;
+  background-color: #f77d5a;
+  font-size: 24px;
+}
+.cell-64 {
+  color: #e6dfdb;
+  background-color: #f65e38;
+  font-size: 24px;
+}
+.cell-128 {
+  color: #f9f6f2;
+  background-color: #eee863;
+  font-size: 24px;
+}
+.cell-256 {
+  color: #f9f6f2;
+  background-color: #edb04d;
+  font-size: 24px;
+}
+.cell-512 {
+  color: #f9f6f2;
+  background-color: #ecb04d;
+  font-size: 24px;
+}
+.cell-1024 {
+  color: #776e65;
+  background-color: #eb9437;
+  font-size: 24px;
+}
+.cell-2048 {
+  color: #e6dfdb;
+  background-color: #dcb71b;
+  font-size: 24px;
 }
 
-.kbd-navigation .square:focus {
-  background: #ddd;
+.score {
+  display: inline-block;
+  padding: 10px;
+  margin-bottom: 20px;
+  border-radius: 5px;
+  background-color: #bbada0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #ede3d9;
 }
 
-.game {
-  display: flex;
-  flex-direction: row;
-}
-
-.game-info {
-  margin-left: 20px;
+.score > span {
+  color: #ffffff;
+  display: block;
+  text-align: center;
+  font-size: 24px;
 }
